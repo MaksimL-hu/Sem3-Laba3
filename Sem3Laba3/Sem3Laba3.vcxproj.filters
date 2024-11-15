@@ -30,12 +30,12 @@
     <ClCompile Include="UserMenu.cpp">
       <Filter>Исходные файлы</Filter>
     </ClCompile>
+    <ClCompile Include="Tests.cpp">
+      <Filter>Исходные файлы</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="IDictionary.h">
-      <Filter>Файлы заголовков</Filter>
-    </ClInclude>
-    <ClInclude Include="Header.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="HashTable.h">
@@ -63,6 +63,12 @@
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
     <ClInclude Include="UserMenu.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Input.h">
+      <Filter>Файлы заголовков</Filter>
+    </ClInclude>
+    <ClInclude Include="Tests.h">
       <Filter>Файлы заголовков</Filter>
     </ClInclude>
   </ItemGroup>

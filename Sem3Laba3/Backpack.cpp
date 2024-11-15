@@ -97,7 +97,7 @@ void Explore(const std::vector<Item>& items, int maxWeight, int maxVolume, State
 //    }
 //}
 
-void Package(const std::vector<Item>& items, int maxWeight, int maxVolume, std::string& fileName)
+void Package(const std::vector<Item>& items, int maxWeight, int maxVolume)
 {
     State bestSolution(items.size());
     int bestValue = 0;
@@ -105,6 +105,6 @@ void Package(const std::vector<Item>& items, int maxWeight, int maxVolume, std::
 
     Explore(items, maxWeight, maxVolume, State(items.size()), 0, bestSolution, bestValue, memo);
 
-    std::cout << "Best \n";
+    std::cout << "Best ";
     PrintSolution(bestSolution);
 }

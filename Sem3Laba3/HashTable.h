@@ -6,6 +6,7 @@
 #include <vector>
 
 #include "IDictionary.h"
+#include "Item.h"
 
 template <typename T>
 void PrintValue(const T& value, std::ostream& os) 
@@ -154,6 +155,14 @@ public:
         return std::nullopt;
     }
 
+    const HashNode<TKey, TValue>* GetNodeAt(int index) const
+    {
+        if (index >= 0 && index < capacity)
+            return array[index];
+
+        return nullptr;
+    }
+
     bool ContainsKey(const TKey& key) const override
     {
         if (GetValue(key))
@@ -177,7 +186,8 @@ public:
         return size == 0;
     }
 
-    void Display() const {
+    void Display() const 
+    {
         for (int i = 0; i < capacity; i++) 
         {
             if (array[i] != nullptr && array[i] != dummy) 

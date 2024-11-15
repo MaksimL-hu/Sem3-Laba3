@@ -54,6 +54,11 @@ public:
         return defaultValue; 
     }
 
+    size_t MemoryUsage() const
+    {
+        return data.GetCount() * (sizeof(size_t) + sizeof(TValue));
+    }
+
     bool ContainsKey(const int& index) const override 
     {
         return data.ContainsKey(index);

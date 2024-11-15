@@ -9,5 +9,6 @@
 std::vector<std::string> SplitIntoWords(const std::string& text);
 HashTable<std::string, std::vector<int>> BuildAlphabetIndex(const std::string& text, int pageSize, bool isByWords);
 void DisplayAlphabetIndex(const HashTable<std::string, std::vector<int>>& hashTable);
+void ProcessFiles(const std::string& inputFileName, const std::string& outputFileName, int pageSize, bool isByWords);
 
 #endif
