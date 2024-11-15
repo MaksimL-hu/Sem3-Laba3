@@ -2,13 +2,13 @@
 #include <string>
 #include <vector>
 
-#include "Item.h"
-#include "FileWorker.h"
 #include "AlphabetIndex.h"
-#include "Commands.h"
 #include "Backpack.h"
-#include "SparseVector.h"
+#include "Commands.h"
+#include "FileWorker.h"
 #include "Input.h"
+#include "Item.h"
+#include "SparseVector.h"
 #include "Tests.h"
 
 using namespace std;
@@ -84,17 +84,21 @@ void OpenMenu()
 			SparseVector<Item> sparseItems;
 			Item* items = (Item*)calloc(count, sizeof(Item));
 
+			if (items == nullptr)
+			{
+				std::cerr << "Memory allocation failed" << "\n";
+				continue;
+			}
+
 			std::cout << "Creating usual array...\n";
 
 			for (size_t i = 0; i < count; i++) {
 				int chance = 1 + std::rand() % 100;
 
-				if (chance > percent) {
+				if (chance > percent) 
 					items[i] = Item(i + 1, i + 1, i + 1);
-				}
-				else {
+				else 
 					items[i] = Item();
-				}
 			}
 
 			std::cout << "Creating sparse vector...\n";
