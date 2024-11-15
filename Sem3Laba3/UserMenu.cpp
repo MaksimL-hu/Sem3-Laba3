@@ -16,7 +16,7 @@ using namespace std;
 void Help()
 {
 	cout << "'" << GenerateFileOfItems << "' - Generate txt file\n"
-		<< "'" << PackItemsInBackpack << "' - Generate txt file\n"
+		<< "'" << PackItemsInBackpack << "' - Calculate the most valuable position of Items in the Backpack\n"
 		<< "'" << CreateSparseVector << "' - Create sparse vector\n"
 		<< "'" << BuildAlphabet << "' - Create indexes for word\n"
 		<< "'" << RunAllTests << "' - run all tests\n";
@@ -84,6 +84,8 @@ void OpenMenu()
 			SparseVector<Item> sparseItems;
 			Item* items = (Item*)calloc(count, sizeof(Item));
 
+			std::cout << "Creating usual array...\n";
+
 			for (size_t i = 0; i < count; i++) {
 				int chance = 1 + std::rand() % 100;
 
@@ -94,6 +96,8 @@ void OpenMenu()
 					items[i] = Item();
 				}
 			}
+
+			std::cout << "Creating sparse vector...\n";
 
 			sparseItems.Add(items, count);
 
