@@ -3,10 +3,9 @@
 
 #include <iostream>
 #include <optional>
-#include <vector>
 
-#include "IDictionary.h"
 #include "HashTable.h"
+#include "IDictionary.h"
 
 template <typename TValue>
 class SparseVector : public IDictionary<int, TValue> {

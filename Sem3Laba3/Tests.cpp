@@ -1,11 +1,11 @@
-#include <iostream>
 #include <cassert>
+#include <iostream>
 #include <string>
 
-#include "HashTable.h"
-#include "SparseVector.h"
 #include "AlphabetIndex.h"
 #include "Backpack.h"
+#include "HashTable.h"
+#include "SparseVector.h"
 
 void TestHashTable() 
 {

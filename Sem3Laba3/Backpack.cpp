@@ -1,11 +1,11 @@
 #include <iostream>
-#include <vector>
-#include <string>
 #include <sstream>
+#include <string>
+#include <vector>
 
-#include "State.h"
-#include "Item.h"
 #include "HashTable.h"
+#include "Item.h"
+#include "State.h"
 
 void PrintSolution(const State& state)
 {

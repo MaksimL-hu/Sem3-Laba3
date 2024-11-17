@@ -1,13 +1,13 @@
-#include <iostream>
-#include <fstream>
 #include <cstdlib>
 #include <ctime>
-#include <vector>
+#include <fstream>
+#include <iostream>
 #include <string>
+#include <vector>
 
+#include "HashTable.h"
 #include "Item.h"
 #include "State.h"
-#include "HashTable.h"
 
 void GenerateItemsToFile(const std::string& filename, int itemCount, int maxWeight, int maxVolume, int maxValue)
 {

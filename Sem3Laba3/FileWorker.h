@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
+#include "HashTable.h"
 #include "Item.h"
 #include "State.h"
-#include "HashTable.h"
 
 void GenerateItemsToFile(const std::string& filename, int itemCount, int maxWeight, int maxVolume, int maxValue);
 std::vector<Item> ReadItemsFromFile(const std::string& filename);

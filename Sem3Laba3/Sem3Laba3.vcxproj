@@ -141,12 +141,15 @@
   <ItemGroup>
     <ClInclude Include="Backpack.h" />
     <ClInclude Include="Commands.h" />
+    <ClInclude Include="DynamicArray.h" />
     <ClInclude Include="FileWorker.h" />
     <ClInclude Include="HashTable.h" />
     <ClInclude Include="AlphabetIndex.h" />
     <ClInclude Include="IDictionary.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Item.h" />
+    <ClInclude Include="Printer.h" />
+    <ClInclude Include="Sequence.h" />
     <ClInclude Include="SparseVector.h" />
     <ClInclude Include="State.h" />
     <ClInclude Include="Tests.h" />
