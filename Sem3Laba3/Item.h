@@ -16,7 +16,7 @@ struct Item {
 
     bool operator!=(const Item& other) const
     {
-        return other.weight != weight && other.volume != volume && other.value != value;
+        return other.weight != weight || other.volume != volume || other.value != value;
     }
 };
 
