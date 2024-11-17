@@ -28,7 +28,8 @@ std::string MemoKey(int index, int weight, int volume)
     return oss.str();
 }
 
-void Explore(const std::vector<Item>& items, int maxWeight, int maxVolume, State current, int index, State& bestSolution, int& bestValue, HashTable<std::string, int>& memo)
+void Explore(const std::vector<Item>& items, int maxWeight, int maxVolume, 
+    State current, int index, State& bestSolution, int& bestValue, HashTable<std::string, int>& memo)
 {
     if (index == items.size())
     {
@@ -99,6 +100,7 @@ void Explore(const std::vector<Item>& items, int maxWeight, int maxVolume, State
 
 void Package(const std::vector<Item>& items, int maxWeight, int maxVolume)
 {
+    //сохранить состояние при котором решение было получено
     State bestSolution(items.size());
     int bestValue = 0;
     HashTable<std::string, int> memo(1000);

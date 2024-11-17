@@ -84,6 +84,7 @@ void WriteAlphabetIndexToFile(const std::string& filename, const HashTable<std::
 
     for (int i = 0; i < hashTable.GetCapacity(); i++)
     {
+        //итератор для нодов
         auto node = hashTable.GetNodeAt(i);
 
         if (node)

@@ -44,11 +44,13 @@ template <typename TKey, typename TValue>
 class HashTable : public IDictionary<TKey, TValue>
 {
 private:
+    //контейнеры и smrtPtr
     HashNode<TKey, TValue>** array;
     int capacity;
     int size;
     HashNode<TKey, TValue>* dummy;
 
+    //таблица должна уметь сжиматься
     void Resize() 
     {
         int oldCapacity = capacity;
@@ -98,6 +100,7 @@ public:
 
     int HashCode(const TKey& key) const
     {
+        //параметр шаблона для хеша
         return std::hash<TKey>{}(key) % capacity;
     }
 
