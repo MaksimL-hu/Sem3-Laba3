@@ -1,25 +1,10 @@
-#include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
 
+#include "DynamicArray.h"
 #include "HashTable.h"
 #include "Item.h"
 #include "State.h"
-
-void PrintSolution(const State& state)
-{
-    std::cout << "Solution - Total Value: " << state.totalValue
-        << ", Total Weight: " << state.totalWeight
-        << ", Total Volume: " << state.totalVolume
-        << ", Items: ";
-
-    for (size_t i = 0; i < state.selectedItems.size(); ++i)
-        if (state.selectedItems[i])
-            std::cout << i + 1 << " ";
-
-    std::cout << "\n";
-}
 
 std::string MemoKey(int index, int weight, int volume)
 {
@@ -28,10 +13,10 @@ std::string MemoKey(int index, int weight, int volume)
     return oss.str();
 }
 
-void Explore(const std::vector<Item>& items, int maxWeight, int maxVolume, 
+void Explore(const DynamicArray<Item>& items, int maxWeight, int maxVolume,
     State current, int index, State& bestSolution, int& bestValue, HashTable<std::string, int>& memo)
 {
-    if (index == items.size())
+    if (index == items.GetLength())
     {
         if (current.totalWeight <= maxWeight && current.totalVolume <= maxVolume)
         {
@@ -55,10 +40,10 @@ void Explore(const std::vector<Item>& items, int maxWeight, int maxVolume,
 
     Explore(items, maxWeight, maxVolume, current, index + 1, bestSolution, bestValue, memo);
 
-    if (current.totalWeight + items[index].weight <= maxWeight &&
+    if (index < current.GetLength() &&
+        current.totalWeight + items[index].weight <= maxWeight &&
         current.totalVolume + items[index].volume <= maxVolume)
     {
-
         current.totalWeight += items[index].weight;
         current.totalVolume += items[index].volume;
         current.totalValue += items[index].value;
@@ -66,47 +51,16 @@ void Explore(const std::vector<Item>& items, int maxWeight, int maxVolume,
 
         Explore(items, maxWeight, maxVolume, current, index + 1, bestSolution, bestValue, memo);
     }
+
 }
 
-//void Explore(const std::vector<Item>& items, int maxWeight, int maxVolume, State current, int index, State& bestSolution, int& bestValue)
-//{
-//    if (index == items.size())
-//    {
-//        if (current.totalWeight <= maxWeight && current.totalVolume <= maxVolume)
-//        {
-//            if (current.totalValue > bestValue)
-//            {
-//                bestValue = current.totalValue;
-//                bestSolution = current;
-//            }
-//        }
-//
-//        return;
-//    }
-//
-//    Explore(items, maxWeight, maxVolume, current, index + 1, bestSolution, bestValue);
-//
-//    if (current.totalWeight + items[index].weight <= maxWeight &&
-//        current.totalVolume + items[index].volume <= maxVolume)
-//    {
-//        current.totalWeight += items[index].weight;
-//        current.totalVolume += items[index].volume;
-//        current.totalValue += items[index].value;
-//        current.selectedItems[index] = true;
-//
-//        Explore(items, maxWeight, maxVolume, current, index + 1, bestSolution, bestValue);
-//    }
-//}
-
-void Package(const std::vector<Item>& items, int maxWeight, int maxVolume)
+State Package(const DynamicArray<Item>& items, int maxWeight, int maxVolume)
 {
-    //сохранить состояние при котором решение было получено
-    State bestSolution(items.size());
+    State bestSolution(items.GetLength());
     int bestValue = 0;
     HashTable<std::string, int> memo(1000);
 
-    Explore(items, maxWeight, maxVolume, State(items.size()), 0, bestSolution, bestValue, memo);
+    Explore(items, maxWeight, maxVolume, State(items.GetLength()), 0, bestSolution, bestValue, memo);
 
-    std::cout << "Best ";
-    PrintSolution(bestSolution);
+    return bestSolution;
 }

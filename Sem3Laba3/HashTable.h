@@ -1,37 +1,14 @@
 #ifndef HASHTABLE_H
 #define HASHTABLE_H
 
-#include <iostream>
 #include <optional>
-#include <vector>
 
+#include "ContainerForUniquePtr.h"
 #include "IDictionary.h"
-#include "Item.h"
-
-template <typename T>
-void PrintValue(const T& value, std::ostream& os) 
-{
-    os << value;
-}
-
-template <typename T>
-void PrintValue(const std::vector<T>& value, std::ostream& os) 
-{
-    os << "[";
-
-    for (size_t i = 0; i < value.size(); ++i) 
-    {
-        os << value[i];
-
-        if (i < value.size() - 1)
-            os << ", ";
-    }
-
-    os << "]";
-}
+#include "UniquePtr.h"
 
 template <typename TKey, typename TValue>
-class HashNode 
+class HashNode
 {
 public:
     TKey key;
@@ -40,99 +17,107 @@ public:
     HashNode(TKey key, TValue value) : key(key), value(value) {}
 };
 
-template <typename TKey, typename TValue>
+template <typename TKey, typename TValue, typename Hash = std::hash<TKey>>
 class HashTable : public IDictionary<TKey, TValue>
 {
 private:
-    //контейнеры и smrtPtr
-    HashNode<TKey, TValue>** array;
+    ContainerForUniquePtr<UniquePtr<HashNode<TKey, TValue>>> array;
     int capacity;
     int size;
-    HashNode<TKey, TValue>* dummy;
+    Hash hashFunction;
 
-    //таблица должна уметь сжиматься
-    void Resize() 
+    void Resize(int newCapacity)
     {
         int oldCapacity = capacity;
-        capacity *= 2;
-        HashNode<TKey, TValue>** newArray = new HashNode<TKey, TValue>* [capacity];
+        capacity = newCapacity;
+        ContainerForUniquePtr<UniquePtr<HashNode<TKey, TValue>>> newArray(capacity);
 
-        for (int i = 0; i < capacity; i++) 
-            newArray[i] = nullptr;
-
-        for (int i = 0; i < oldCapacity; i++) 
+        for (int i = 0; i < oldCapacity; i++)
         {
-            if (array[i] != nullptr && array[i] != dummy) 
+            if (array[i].Get())
             {
-                int hashIndex = HashCode(array[i]->key);
+                int hashIndex = HashCode(array[i].Get()->key);
 
-                while (newArray[hashIndex] != nullptr) 
+                while (newArray[hashIndex].Get())
                     hashIndex = (hashIndex + 1) % capacity;
 
-                newArray[hashIndex] = array[i];
+                newArray[hashIndex] = std::move(array[i]);
             }
         }
 
-        delete[] array;
-        array = newArray;
+        array = std::move(newArray);
     }
 
 public:
-    HashTable(int capacity = 20) : capacity(capacity), size(0) 
+    HashTable(int capacity = 20)
     {
-        array = new HashNode<TKey, TValue>* [capacity];
+        int thisCapacity;
 
-        for (int i = 0; i < capacity; i++)
-            array[i] = nullptr;
+        if (capacity <= 0)
+            thisCapacity = 20;
+        else
+            thisCapacity = capacity;
 
-        dummy = new HashNode<TKey, TValue>(TKey(), TValue());
+        this->capacity = thisCapacity;
+        size = 0;
+        array = ContainerForUniquePtr<UniquePtr<HashNode<TKey, TValue>>>(thisCapacity);
     }
 
-    ~HashTable() 
-    {
-        for (int i = 0; i < capacity; ++i) 
-            if (array[i] && array[i] != dummy) 
-                delete array[i];
-
-        delete[] array;
-        delete dummy;
-    }
+    ~HashTable() = default;
 
     int HashCode(const TKey& key) const
     {
-        //параметр шаблона для хеша
-        return std::hash<TKey>{}(key) % capacity;
+        return hashFunction(key) % capacity;
     }
 
     void Add(const TKey& key, const TValue& value) override
     {
-        if (size >= capacity * 0.7) 
-            Resize();
+        if (size >= capacity * 0.7)
+            Resize(capacity * 2);
 
-        HashNode<TKey, TValue>* temp = new HashNode<TKey, TValue>(key, value);
         int hashIndex = HashCode(key);
 
-        while (array[hashIndex] != nullptr && array[hashIndex] != dummy && array[hashIndex]->key != key)
-            hashIndex = (hashIndex + 1) % capacity;
+        while (array[hashIndex].Get())
+        {
+            if (array[hashIndex].Get()->key == key)
+            {
+                array[hashIndex].Get()->value = value;
+                return;
+            }
+            else
+                hashIndex = (hashIndex + 1) % capacity;
+        }
 
-        if (array[hashIndex] == nullptr || array[hashIndex] == dummy)
-            size++;
-        else
-            delete array[hashIndex];
-
-        array[hashIndex] = temp;
+        array[hashIndex] = UniquePtr<HashNode<TKey, TValue>>(new HashNode<TKey, TValue>(key, value));
+        size++;
     }
 
     void Remove(const TKey& key) override
     {
         int hashIndex = HashCode(key);
 
-        while (array[hashIndex] != nullptr) 
+        while (array[hashIndex].Get())
         {
-            if (array[hashIndex]->key == key) 
+            if (array[hashIndex].Get()->key == key)
             {
-                array[hashIndex] = dummy;
+                array[hashIndex].Reset();
                 size--;
+                
+                int nextIndex = (hashIndex + 1) % capacity;
+
+                while (array[nextIndex].Get())
+                {
+                    auto node = std::move(array[nextIndex]);
+                    array[nextIndex].Reset();
+                    size--;
+                    Add(node->key, node->value);
+                    nextIndex = (nextIndex + 1) % capacity;
+                }
+
+                if (size <= capacity / 4 && capacity > 20)
+                    Resize(capacity / 2);
+
+                return;
             }
 
             hashIndex = (hashIndex + 1) % capacity;
@@ -142,15 +127,11 @@ public:
     std::optional<TValue> GetValue(const TKey& key) const override
     {
         int hashIndex = HashCode(key);
-        int counter = 0;
 
-        while (array[hashIndex] != nullptr) 
+        while (array[hashIndex].Get())
         {
-            if (counter++ > capacity)
-                return std::nullopt;
-
-            if (array[hashIndex]->key == key)
-                return array[hashIndex]->value;
+            if (array[hashIndex].Get()->key == key)
+                return array[hashIndex].Get()->value;
 
             hashIndex = (hashIndex + 1) % capacity;
         }
@@ -158,20 +139,9 @@ public:
         return std::nullopt;
     }
 
-    const HashNode<TKey, TValue>* GetNodeAt(int index) const
-    {
-        if (index >= 0 && index < capacity)
-            return array[index];
-
-        return nullptr;
-    }
-
     bool ContainsKey(const TKey& key) const override
     {
-        if (GetValue(key))
-            return true;
-       
-        return false;
+        return GetValue(key).has_value();
     }
 
     int GetCount() const override
@@ -184,22 +154,27 @@ public:
         return capacity;
     }
 
-    bool IsEmpty() const 
+    bool IsEmpty() const
     {
         return size == 0;
     }
 
-    void Display() const 
+    bool ConstainsIndex(const int index) const
     {
-        for (int i = 0; i < capacity; i++) 
-        {
-            if (array[i] != nullptr && array[i] != dummy) 
-            {
-                std::cout << "key = " << array[i]->key << "  value = ";
-                PrintValue(array[i]->value, std::cout);
-                std::cout << std::endl;
-            }
-        }
+        if (index < 0 || index > capacity)
+            return false;
+
+        return array[index].Get() != nullptr;
+    }
+
+    TKey& GetKeyByIndex(const int index) const
+    {
+        return array[index].Get()->key;
+    }
+
+    TValue& GetValueByIndex(const int index) const
+    {
+        return array[index].Get()->value;
     }
 };
 

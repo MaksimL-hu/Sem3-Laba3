@@ -1,6 +1,8 @@
 #ifndef IDICTIONARY_H
 #define IDICTIONARY_H
 
+#include <optional>
+
 template <typename TKey, typename TValue>
 class IDictionary {
 public:

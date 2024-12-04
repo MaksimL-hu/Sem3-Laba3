@@ -1,30 +1,29 @@
-#include <iostream>
 #include <sstream>
 #include <string>
-#include <vector>
 
+#include "DynamicArray.h"
 #include "HashTable.h"
 
-std::vector<std::string> SplitIntoWords(const std::string& text)
+DynamicArray<std::string> SplitIntoWords(const std::string& text)
 {
     std::istringstream stream(text);
-    std::vector<std::string> words;
+    DynamicArray<std::string> words;
     std::string word;
 
     while (stream >> word)
-        words.push_back(word);
+        words.Append(word);
 
     return words;
 }
 
-HashTable<std::string, std::vector<int>> BuildAlphabetIndex(const std::string& text, int pageSize, bool isByWords)
+void BuildAlphabetIndex(HashTable<std::string, DynamicArray<int>>& wordPageHashTable, const std::string& text,
+    int pageSize, bool isByWords)
 {
-    HashTable<std::string, std::vector<int>> wordPageHashTable;
-    std::vector<std::string> words = SplitIntoWords(text);
+    DynamicArray<std::string> words = SplitIntoWords(text);
     int currentPage = 1;
     int currentPageSize = 0;
 
-    for (size_t i = 0; i < words.size(); ++i)
+    for (int i = 0; i < words.GetLength(); ++i)
     {
         std::string word = words[i];
         int wordLength = isByWords ? 1 : word.size();
@@ -47,23 +46,22 @@ HashTable<std::string, std::vector<int>> BuildAlphabetIndex(const std::string& t
             currentPageSize = isByWords ? 1 : word.size();
         }
 
-        auto pages = wordPageHashTable.GetValue(word);
-
-        if (pages.has_value())
+        if (wordPageHashTable.ContainsKey(word))
         {
-            pages->push_back(currentPage);
-            wordPageHashTable.Add(word, *pages);
+            auto pagesOptional = wordPageHashTable.GetValue(word);
+
+            if (pagesOptional.has_value())
+            {
+                DynamicArray<int>& pages = pagesOptional.value();
+                pages.Append(currentPage);
+                wordPageHashTable.Add(word, pages);
+            }
         }
         else
         {
-            wordPageHashTable.Add(word, { currentPage });
+            DynamicArray<int> newPages;
+            newPages.Append(currentPage);
+            wordPageHashTable.Add(word, newPages);
         }
     }
-
-    return wordPageHashTable;
-}
-
-void DisplayAlphabetIndex(const HashTable<std::string, std::vector<int>>& hashTable)
-{
-    hashTable.Display();
 }

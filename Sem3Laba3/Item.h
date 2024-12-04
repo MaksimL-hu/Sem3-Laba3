@@ -1,7 +1,8 @@
 #ifndef ITEM_H
 #define ITEM_H
 
-struct Item {
+struct Item 
+{
     int weight;
     int volume;
     int value;

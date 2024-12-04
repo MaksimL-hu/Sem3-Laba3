@@ -1,13 +1,14 @@
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include "AlphabetIndex.h"
 #include "Backpack.h"
 #include "Commands.h"
+#include "DynamicArray.h"
 #include "FileWorker.h"
 #include "Input.h"
 #include "Item.h"
+#include "Printer.h"
 #include "SparseVector.h"
 #include "Tests.h"
 
@@ -68,10 +69,17 @@ void OpenMenu()
 			ReadVariable(maxVolume, "Write max volume of Backpack");
 
 			cout << "Reading in progress...\n";
-			vector<Item> items = ReadItemsFromFile(fileName);
+			DynamicArray<Item> items = ReadItemsFromFile(fileName);
+
+			if (items.GetLength() == 0)
+			{
+				std::cerr << "Memory allocation failed" << "\n";
+				continue;
+			}
 
 			cout << "Calculating item placement...\n";
-			Package(items, maxWeight, maxVolume);
+
+			PrintSolution<void>(Package(items, maxWeight, maxVolume), std::cout);
 		}
 		else if (userInput == CreateSparseVector)
 		{
@@ -82,46 +90,25 @@ void OpenMenu()
 			ReadVariable(percent, "Write percent of null data");
 
 			SparseVector<Item> sparseItems;
-			Item* items = (Item*)calloc(count, sizeof(Item));
-
-			if (items == nullptr)
-			{
-				std::cerr << "Memory allocation failed" << "\n";
-				continue;
-			}
+			DynamicArray<Item> items(count);
 
 			std::cout << "Creating usual array...\n";
 
-			for (size_t i = 0; i < count; i++) {
+			for (int i = 0; i < count; i++) {
 				int chance = 1 + std::rand() % 100;
 
-				if (chance > percent) 
+				if (chance > percent)
 					items[i] = Item(i + 1, i + 1, i + 1);
-				else 
+				else
 					items[i] = Item();
 			}
 
 			std::cout << "Creating sparse vector...\n";
 
-			sparseItems.Add(items, count);
+			sparseItems.Add(items);
 
 			std::cout << "The memory occupied in the array: " << sizeof(Item) * count << " bytes\n";
 			std::cout << "The memory occupied in the sparse vector: " << sparseItems.MemoryUsage() << " bytes\n";
-
-			/*for (size_t i = 0; i < count; i++) 
-			{
-				auto value = sparseItems.GetValue(i);
-
-				if (value.has_value()) 
-				{
-					std::cout << "Item " << i << ": "
-						<< value->weight << " "
-						<< value->volume << " "
-						<< value->value << "\n";
-				}
-			}*/
-
-			free(items);
 		}
 		else if (userInput == BuildAlphabet)
 		{
@@ -143,14 +130,22 @@ void OpenMenu()
 				continue;
 			}
 
-			HashTable<std::string, std::vector<int>> alphabetIndex = BuildAlphabetIndex(text, pageSize, isByWords);
+			HashTable<std::string, DynamicArray<int>> alphabetIndex;
+			BuildAlphabetIndex(alphabetIndex, text, pageSize, isByWords);
 			WriteAlphabetIndexToFile(outputFileName, alphabetIndex);
 
 			std::cout << "Alphabet index has been saved to " << outputFileName << "\n";
 		}
 		else if (userInput == RunAllTests)
 		{
-			TestAll();
+			TestHashTable();
+			std::cout << "Hash Table tests passed" << std::endl;
+			TestSparseVector();
+			std::cout << "Sparse Vector tests passed" << std::endl;
+			TestBackPack();
+			std::cout << "Back Pack tests passed" << std::endl;
+			TestAlphabetIndex();
+			std::cout << "Alphabet Index tests passed" << std::endl;
 		}
 		else
 		{

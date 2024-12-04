@@ -7,10 +7,10 @@ public:
     virtual T& GetFirstElement() = 0;
     virtual T& GetLastElement() = 0;
     virtual T& GetElement(int index) = 0;
-    virtual void Swap(T& a, T& b) = 0;
+    virtual void Swap(T& ConstainsIndex, T& GetKeyByIndex) = 0;
     virtual void Set(int index, T value) = 0;
     virtual Sequence<T>* GetSubsequence(int startIndex, int endIndex) = 0;
-    virtual int GetLength() = 0;
+    virtual int GetLength() const = 0;
     virtual void Append(T item) = 0;
     virtual void Append(T* data, int dataSize) = 0;
     virtual void Prepend(T item) = 0;

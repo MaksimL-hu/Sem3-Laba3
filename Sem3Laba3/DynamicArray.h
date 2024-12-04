@@ -1,8 +1,6 @@
 #ifndef DYNAMIC_ARRAY_H
 #define DYNAMIC_ARRAY_H
 
-#include <iostream>
-
 #include "Sequence.h"
 
 template <class T>
@@ -70,8 +68,6 @@ public:
         return new DynamicArrayIterator(data + size);
     }
 
-    DynamicArray() : size(0) {}
-
     DynamicArray(T* items, int size)
     {
         this->size = size;
@@ -83,29 +79,60 @@ public:
         }
     }
 
-    DynamicArray(int size)
+    DynamicArray(T example, int size)
+    {
+        this->size = size;
+        data = new T[size];
+
+        for (int i = 0; i < size; ++i)
+        {
+            Set(i, example);
+        }
+    }
+
+    DynamicArray(int size = 0)
     {
         this->size = size;
         data = new T[size];
     }
 
-    DynamicArray(DynamicArray<T>& dynamicArray)
+    DynamicArray(const DynamicArray& other)
     {
-        size = dynamicArray.size;
+        size = other.size;
         data = new T[size];
 
         for (int i = 0; i < size; ++i)
-        {
-            Set(i, dynamicArray.data[i]);
-        }
+            data[i] = other.data[i];
+    }
+
+    DynamicArray& operator=(const DynamicArray& other)
+    {
+        if (this == &other)
+            return *this;
+
+        delete[] data;
+
+        size = other.size;
+        data = new T[size];
+
+        for (int i = 0; i < size; ++i)
+            data[i] = other.data[i];
+
+        return *this;
     }
 
     ~DynamicArray()
     {
-        delete[] data;
+        if (data)
+            delete[] data;
     }
 
     T& operator[](int index)
+    {
+        return data[index];
+    }
+
+    T& operator[](int index) const
     {
         return data[index];
     }
@@ -125,11 +152,11 @@ public:
         return data[index];
     }
 
-    void Swap(T& a, T& b) override
+    void Swap(T& ConstainsIndex, T& GetKeyByIndex) override
     {
-        T temp = a;
-        a = b;
-        b = temp;
+        T temp = ConstainsIndex;
+        ConstainsIndex = GetKeyByIndex;
+        GetKeyByIndex = temp;
     }
 
     void Set(int index, T value) override
@@ -165,7 +192,7 @@ public:
         return new DynamicArray<T>(items, length);
     }
 
-    int GetLength() override
+    int GetLength() const override
     {
         return size;
     }

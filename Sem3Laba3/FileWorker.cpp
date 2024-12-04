@@ -3,10 +3,11 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-#include <vector>
 
+#include "DynamicArray.h"
 #include "HashTable.h"
 #include "Item.h"
+#include "Printer.h"
 #include "State.h"
 
 void GenerateItemsToFile(const std::string& filename, int itemCount, int maxWeight, int maxVolume, int maxValue)
@@ -32,10 +33,10 @@ void GenerateItemsToFile(const std::string& filename, int itemCount, int maxWeig
     file.close();
 }
 
-std::vector<Item> ReadItemsFromFile(const std::string& filename)
+DynamicArray<Item> ReadItemsFromFile(const std::string& filename)
 {
     std::ifstream file(filename);
-    std::vector<Item> items;
+    DynamicArray<Item> items;
 
     if (!file) 
     {
@@ -46,7 +47,7 @@ std::vector<Item> ReadItemsFromFile(const std::string& filename)
     int weight, volume, value;
 
     while (file >> weight >> volume >> value)
-        items.push_back({ weight, volume, value });
+        items.Append({ weight, volume, value });
 
     file.close();
 
@@ -56,13 +57,16 @@ std::vector<Item> ReadItemsFromFile(const std::string& filename)
 std::string ReadTextFromFile(const std::string& filename)
 {
     std::ifstream file(filename);
+
     if (!file.is_open())
     {
         std::cerr << "Error: Unable to open file " << filename << "\n";
         return "";
     }
 
-    std::string line, text;
+    std::string line;
+    std::string text;
+
     while (std::getline(file, line))
     {
         text += line + "\n";
@@ -73,27 +77,17 @@ std::string ReadTextFromFile(const std::string& filename)
     return text;
 }
 
-void WriteAlphabetIndexToFile(const std::string& filename, const HashTable<std::string, std::vector<int>>& hashTable)
+void WriteAlphabetIndexToFile(const std::string& filename, const HashTable<std::string, DynamicArray<int>>& hashTable)
 {
     std::ofstream file(filename);
+
     if (!file.is_open())
     {
         std::cerr << "Error: Unable to open file " << filename << "\n";
         return;
     }
 
-    for (int i = 0; i < hashTable.GetCapacity(); i++)
-    {
-        //итератор для нодов
-        auto node = hashTable.GetNodeAt(i);
-
-        if (node)
-        {
-            file << "Word: " << node->key << "  Pages: ";
-            PrintValue(node->value, file);
-            file << "\n";
-        }
-    }
+    PrintValue(hashTable, file);
 
     file.close();
 }

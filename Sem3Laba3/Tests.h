@@ -3,8 +3,7 @@
 
 void TestHashTable();
 void TestSparseVector();
-void TestBuildAlphabetIndex();
-void TestPackage();
-void TestAll();
+void TestBackPack();
+void TestAlphabetIndex();
 
 #endif
